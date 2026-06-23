@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="top-bar">
+      <div>
+        <p class="eyebrow">Project tracking</p>
+        <h1>Active Project Dashboard</h1>
+      </div>
+      <div class="top-bar-actions">
+        <span class="pill pill--neutral">Updated Today</span>
+        <button class="btn btn--primary">Export</button>
+      </div>
+    </header>
+
+    <main class="dashboard-grid">
+      <section class="panel summary-panel">
+        <div class="summary-card">
+          <span>Total Projects</span>
+          <strong id="totalProjects">0</strong>
+        </div>
+        <div class="summary-card">
+          <span>Material Ordered</span>
+          <strong id="orderedCount">0</strong>
+        </div>
+        <div class="summary-card">
+          <span>Material Received</span>
+          <strong id="receivedCount">0</strong>
+        </div>
+        <div class="summary-card">
+          <span>Kickoff Complete</span>
+          <strong id="kickoffCount">0</strong>
+        </div>
+      </section>
+
+      <section class="panel tab-panel">
+        <div class="tab-buttons">
+          <button class="tab-btn active" data-tab="entry">Data Entry</button>
+          <button class="tab-btn" data-tab="overview">Project Overview</button>
+          <button class="tab-btn" data-tab="scheduling">Scheduling</button>
+        </div>
+
+        <div class="tab-filter-row">
+          <label>
+            <span>Manager filter</span>
+            <select id="managerFilter">
+              <option value="">All managers</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="tab-content active" data-tab-content="entry">
+          <section class="add-project-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Data entry</p>
+                <h2>Add a project</h2>
+              </div>
+            </div>
+            <form id="projectForm" class="project-form">
+              <div class="form-grid">
+                <label>
+                  <span>Project #</span>
+                  <input type="text" name="projectNumber" placeholder="P-XXXX" required />
+                </label>
+                <label>
+                  <span>Project Name</span>
+                  <input type="text" name="name" placeholder="Project name" required />
+                </label>
+                <label>
+                  <span>Project Status</span>
+                  <select name="status">
+                    <option>Not Started</option>
+                    <option>In Progress</option>
+                    <option>Complete</option>
+                  </select>
+                </label>
+                <label>
+                  <span>General Timeline</span>
+                  <input type="text" name="generalTimeline" placeholder="Q3 2026" required />
+                </label>
+                <label>
+                  <span>Official Schedule</span>
+                  <input type="date" name="officialSchedule" required />
+                </label>
+                <label>
+                  <span>Duration (days)</span>
+                  <input type="number" name="duration" min="1" max="365" placeholder="14" />
+                </label>
+                <label>
+                  <span>Internal Kickoff</span>
+                  <select name="internalKickoff">
+                    <option>Pending</option>
+                    <option>In Progress</option>
+                    <option>Completed</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Material Kickoff</span>
+                  <select name="materialKickoff">
+                    <option>Pending</option>
+                    <option>In Progress</option>
+                    <option>Completed</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Material Ordered</span>
+                  <select name="materialOrdered">
+                    <option>Pending</option>
+                    <option>In Progress</option>
+                    <option>Completed</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Material Received</span>
+                  <select name="materialReceived">
+                    <option>Pending</option>
+                    <option>In Progress</option>
+                    <option>Completed</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Project Owner</span>
+                  <input type="text" name="owner" placeholder="Owner name" />
+                </label>
+                <label>
+                  <span>Project Manager</span>
+                  <input type="text" name="manager" placeholder="Project manager" />
+                </label>
+                <label>
+                  <span>Priority</span>
+                  <select name="priority">
+                    <option>Low</option>
+                    <option selected>Medium</option>
+                    <option>High</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Notes</span>
+                  <input type="text" name="notes" placeholder="Additional notes" />
+                </label>
+              </div>
+              <button class="btn btn--primary" type="submit">Add Project</button>
+            </form>
+          </section>
+        </div>
+
+        <div class="tab-content" data-tab-content="overview">
+          <section class="table-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Overview</p>
+                <h2>Project list</h2>
+              </div>
+            </div>
+            <div id="undoMessage" class="undo-message" hidden></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Project #</th>
+                    <th>Project Name</th>
+                    <th>Manager</th>
+                    <th>Status</th>
+                    <th>Internal Kickoff</th>
+                    <th>Material Kickoff</th>
+                    <th>Material Ordered</th>
+                    <th>Material Received</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="projectTableBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="swimlane-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Workflow</p>
+                <h2>Project swim lanes</h2>
+              </div>
+            </div>
+            <div class="swimlanes">
+              <div class="lane">
+                <div class="lane-header">
+                  <h3>Internal Kickoff</h3>
+                  <span id="internalLaneCount">0</span>
+                </div>
+                <div class="lane-body" id="internalLane"></div>
+              </div>
+              <div class="lane">
+                <div class="lane-header">
+                  <h3>Material Kickoff</h3>
+                  <span id="materialLaneCount">0</span>
+                </div>
+                <div class="lane-body" id="materialLane"></div>
+              </div>
+              <div class="lane">
+                <div class="lane-header">
+                  <h3>Material Ordered</h3>
+                  <span id="orderedLaneCount">0</span>
+                </div>
+                <div class="lane-body" id="orderedLane"></div>
+              </div>
+              <div class="lane">
+                <div class="lane-header">
+                  <h3>Material Received</h3>
+                  <span id="receivedLaneCount">0</span>
+                </div>
+                <div class="lane-body" id="receivedLane"></div>
+              </div>
+              <div class="lane">
+                <div class="lane-header">
+                  <h3>Project Status</h3>
+                  <span id="statusLaneCount">0</span>
+                </div>
+                <div class="lane-body" id="statusLane"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="tab-content" data-tab-content="scheduling">
+          <section class="scheduling-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Scheduling</p>
+                <h2>Project scheduling lanes</h2>
+              </div>
+            </div>
+            <div class="schedule-banners" id="scheduleBanners"></div>
+            <div class="gantt-panel">
+              <div class="gantt-header">
+                <span>Start timeline</span>
+                <span id="ganttRangeLabel">--</span>
+              </div>
+              <div class="gantt-chart" id="ganttChart"></div>
+              <div class="gantt-legend">Working days: Monday–Friday</div>
+            </div>
+            <div class="schedule-swimlanes" id="scheduleSwimlanes"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
