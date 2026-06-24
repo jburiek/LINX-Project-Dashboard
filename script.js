@@ -53,6 +53,10 @@ const defaultProjects = [
 
 let projects = [];
 
+// Edit these lists to pre-populate dropdown options.
+const defaultOwnerOptions = ['Joshua Buriek', 'Bob Christiansen', 'Jason Harris'];
+const defaultManagerOptions = ['Joshua Buriek', 'Bob Christiansen', 'Jason Harris'];
+
 async function loadProjects() {
   try {
     const response = await fetch('/api/projects');
@@ -122,7 +126,10 @@ function getFilteredProjects() {
 function updateManagerFilterOptions() {
   if (!managerFilter) return;
   const existingValue = managerFilter.value;
-  const managers = [...new Set(projects.map((project) => project.manager).filter(Boolean))].sort();
+  const managers = [...new Set([
+    ...defaultManagerOptions,
+    ...projects.map((project) => project.manager).filter(Boolean)
+  ])].sort();
 
   managerFilter.innerHTML = '<option value="">All managers</option>' +
     managers.map((manager) => `
@@ -131,6 +138,41 @@ function updateManagerFilterOptions() {
 
   if (existingValue && managers.includes(existingValue)) {
     managerFilter.value = existingValue;
+  }
+}
+
+function updateAssignmentDropdownOptions() {
+  const ownerSelect = projectForm?.elements?.owner;
+  const managerSelect = projectForm?.elements?.manager;
+  if (!ownerSelect || !managerSelect) {
+    return;
+  }
+
+  const selectedOwner = ownerSelect.value;
+  const selectedManager = managerSelect.value;
+  const owners = [...new Set([
+    ...defaultOwnerOptions,
+    ...projects.map((project) => project.owner).filter(Boolean)
+  ])].sort();
+  const managers = [...new Set([
+    ...defaultManagerOptions,
+    ...projects.map((project) => project.manager).filter(Boolean)
+  ])].sort();
+
+  ownerSelect.innerHTML =
+    '<option value="">Unassigned</option>' +
+    owners.map((owner) => `<option value="${owner}">${owner}</option>`).join('');
+
+  managerSelect.innerHTML =
+    '<option value="">Unassigned</option>' +
+    managers.map((manager) => `<option value="${manager}">${manager}</option>`).join('');
+
+  if (selectedOwner && owners.includes(selectedOwner)) {
+    ownerSelect.value = selectedOwner;
+  }
+
+  if (selectedManager && managers.includes(selectedManager)) {
+    managerSelect.value = selectedManager;
   }
 }
 
@@ -236,6 +278,7 @@ function renderDashboard() {
   const undoMessage = document.getElementById('undoMessage');
 
   updateManagerFilterOptions();
+  updateAssignmentDropdownOptions();
   const filteredProjects = getFilteredProjects();
 
   document.getElementById('totalProjects').textContent = filteredProjects.length;
